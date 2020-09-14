@@ -1,10 +1,15 @@
 var express = require('express');
 var router = express.Router();
 let sqlQuery = require('../../../MySql/sql');
+let {analysis} = require('../../tools/tools')
+
 
 /* GET users listing. */
 router.post('/', async (req, res, next) => {
-  let page = req.body.page;
+
+  let token = analysis(req.headers['authentication'])
+  if(token.key){
+    let page = req.body.page;
   // 查询第page页的用户信息
   let strQuery = "select username,account,password,sex,email,phonenumber,address,rolename,register_time from user inner join role on user.roleid = role.id limit ?,6"
   // 查询用户的总人数
@@ -15,7 +20,12 @@ router.post('/', async (req, res, next) => {
     tableData:result,
     total:total[0].total
   }
-  res.json(obj)
+    res.send({code:200,data:obj})
+  }else{
+    res.send({code:400,data:"用户未登录"})
+  }
+
+
 });
 
 // 删除指定用户

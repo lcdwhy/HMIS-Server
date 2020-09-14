@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+let {analysis} = require('../../tools/tools')
 
 // 引入上传模块
 var multer = require('multer');
@@ -10,7 +11,8 @@ var strQuery = require('../../../MySql/sql');
 const sqlQuery = require('../../../MySql/sql');
 /* GET home page. */
 router.post('/', async (req, res, next) => {
-  let username = req.session.username;
+  let token = analysis(req.headers['authentication'])
+  let username = token.key
   let str = "select * from admin where account = ?"
   let result =await strQuery(str, [username])
   res.json(result);
@@ -30,7 +32,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 //文章保存到数据库中 
 router.post('/report', async (req, res) => {
   
-  let username = req.session.username; //设置发布者的名字
+  let token = analysis(req.headers['authentication'])
+  console.log(token)
+  let username = token.key              //设置发布者的名字
   let title = req.body.title;           //发布文章的标题
   let content = req.body.content;       //发布文章的内容
   let report_time = format(new Date()); //设置发布时间

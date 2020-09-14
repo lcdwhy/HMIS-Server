@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 let sqlQuery = require('../../../MySql/sql');
 let crypto = require('crypto');
+let {analysis} = require('../../tools/tools')
 
 function jiami(str) {
     let salt = "haskdaksgasf"
@@ -14,10 +15,9 @@ function jiami(str) {
 /* 修改管理员的登录密码*/
 router.post('/', async (req, res) => {
     let newpassword =jiami(req.body.password);
-    console.log(req.body.password)
-    console.log("ssssddd")
-    console.log(newpassword)
-    let username = req.session.username;
+    
+    let token = analysis(req.headers['authentication'])
+     let username = token.key
     let str = "update admin set password = ? where username= ?"
     let result = await sqlQuery(str, [newpassword, username]);
     console.log(result)

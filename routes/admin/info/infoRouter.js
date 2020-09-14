@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var changepassword = require('./changepassword')
+let {analysis} = require('../../tools/tools')
 
 // 引入上传模块
 var multer = require('multer');
@@ -10,8 +11,9 @@ var fs = require('fs')
 var sqlQuery = require('../../../MySql/sql');
 
 // 获取管理员的信息
-router.post('/', async (req, res, next) => {
-  let username = req.session.username;
+router.post('/', async (req, res) => {
+  let token = analysis(req.headers['authentication'])
+  let username = token.key
   let str = "select * from admin where username = ?"
   let result =await sqlQuery(str, [username])
   res.json(result);
@@ -19,7 +21,8 @@ router.post('/', async (req, res, next) => {
 
 //头像上传
 router.post('/upload', upload.single('file'), async (req, res) => {
-  let username = req.session.username
+  let token = analysis(req.headers['authentication'])
+  let username = token.key
   let result = rename(req)
   let str = "update admin set imgUrl = ? where username = ?"
   await sqlQuery(str,[result.imgUrl,username])

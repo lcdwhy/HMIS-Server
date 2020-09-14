@@ -25,13 +25,13 @@ router.post('/', async (req, res) => {
     let result =await sqlQuery(strQuery,[account]);
     
     if(result.length != 0){
-        res.send("账号已存在")
+        res.send({code:400,data:"账号已存在"})
     }else{
         strQuery = "INSERT INTO `admin`(username,account,password,email) VALUES(?,?,?,?)"
         let result =await sqlQuery(strQuery,[username,account,jiami(password),email]);
-        res.send("注册成功")
+        res.send({code:200,data:"注册成功"})
     }
-    res.send("ok")
+    
 })
 
 module.exports = router;
